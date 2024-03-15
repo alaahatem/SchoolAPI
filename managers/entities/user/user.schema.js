@@ -1,17 +1,16 @@
 module.exports = {
-    createUser: [
-        {
-            label: "email",
-            model: "email",
-            required: true,
-
-          },
-          {
-            label: "password",
-            model: "password",
-            type: "String",
-            required: true,
-          },
-    ],
-    loginUser: [{}],
-  };
+  createUser: [
+    {
+      label: "email",
+      path: "email",
+      model: "email",
+      required: true,
+    },
+    {
+      label: "password",
+      model: "password",
+      required: true,
+    },
+  ],
+  loginUser: [{}],
+};
