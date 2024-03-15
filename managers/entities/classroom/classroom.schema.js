@@ -1,35 +1,34 @@
 module.exports = {
   create: [
     {
-      model: "text",
+      model: "roomName",
       path: "name",
       required: true,
     },
     {
-      model: "address",
-      path: "address",
+      model: "id",
+      path: "schoolID",
       required: true,
     },
+    {
+      model: "arrayOfStrings",
+      path: "students",
+    },
   ],
-
   update: [
     {
       label: "id",
+      path: "id",
       model: "id",
       type: "Number",
       required: true,
     },
     {
-      model: "text",
+      model: "roomName",
       path: "name",
-    },
-    {
-      label: "address",
-      model: "address",
-      type: "String",
+      required: true,
     },
   ],
-
   delete: [
     {
       label: "id",
@@ -39,7 +38,6 @@ module.exports = {
       required: true,
     },
   ],
-
   getByID: [
     {
       label: "id",
@@ -50,4 +48,5 @@ module.exports = {
     },
   ],
   getAll: [],
+
 };
