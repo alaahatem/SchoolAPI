@@ -5,6 +5,7 @@ const {
   notFoundError,
   nonAuthorizedError,
 } = require("../errorHandlers");
+const roles = require("../_common/utils")
 const UserModel = require("./user.mongoModel");
 class User {
   constructor({
@@ -25,7 +26,8 @@ class User {
     this.httpExposed = ["createUser", "login"];
   }
 
-  async createUser({ email, password, role = "super-admin" }) {
+  async createUser({ email, password, role = roles.SUPER_ADMIN }) {
+    //By Default a super admin is created unless specified
     const userData = { email, password };
     // Data validation
     const validationResult = await this.validators.user.createUser(userData);
@@ -55,7 +57,7 @@ class User {
 
       return { status: 201, user: savedUser, longToken };
     } catch (err) {
-      console.error("Error creating superadmin:", err);
+      console.error("Error creating user:", err);
     }
   }
 
