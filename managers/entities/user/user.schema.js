@@ -1,22 +1,4 @@
 module.exports = {
-<<<<<<< Updated upstream
-    createUser: [
-        {
-            label: "email",
-            model: "email",
-            required: true,
-
-          },
-          {
-            label: "password",
-            model: "password",
-            type: "String",
-            required: true,
-          },
-    ],
-    loginUser: [{}],
-  };
-=======
   createAdmin: [
     {
       label: "email",
@@ -74,4 +56,3 @@ module.exports = {
     },
   ],
 };
->>>>>>> Stashed changes
