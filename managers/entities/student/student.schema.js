@@ -1,33 +1,42 @@
 module.exports = {
   create: [
     {
-      model: "roomName",
+      model: "text",
       path: "name",
       required: true,
     },
     {
+      model: "number",
+      path: "age",
+      required: true,
+    },
+    {
+      path: "classroomID",
       model: "id",
-      path: "schoolID",
       required: true,
     },
   ],
+
   update: [
     {
-      label: "id",
       path: "id",
       model: "id",
-      type: "Number",
       required: true,
     },
     {
-      model: "roomName",
+      model: "text",
       path: "name",
     },
     {
+      path: "age",
+      model: "number",
+    },
+    {
+      path: "classroomID",
       model: "id",
-      path: "schoolID",
     },
   ],
+
   delete: [
     {
       label: "id",
@@ -37,6 +46,7 @@ module.exports = {
       required: true,
     },
   ],
+
   getByID: [
     {
       label: "id",
@@ -47,5 +57,4 @@ module.exports = {
     },
   ],
   getAll: [],
-
 };

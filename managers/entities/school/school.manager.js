@@ -4,8 +4,12 @@ const {
   notFoundError,
   nonAuthorizedError,
 } = require("../errorHandlers");
-const roles = require("../_common/utils");
+const _ = require("lodash");
+
+const { roles, hasScope } = require("../_common/utils");
 const SchoolModel = require("./school.mongoModel");
+const ClassRoomModel = require("../classroom/classroom.mongoModel");
+const UserModel = require("../user/user.mongoModel");
 const { query } = require("express");
 class School {
   constructor({
@@ -22,7 +26,7 @@ class School {
     this.validators = validators;
     this.mongomodels = mongomodels;
     this.tokenManager = managers.token;
-    this.usersCollection = "school";
+    this.name = "school";
     this.httpExposed = [
       "create",
       "put=update",
@@ -38,31 +42,28 @@ class School {
       getAll: [roles.SUPER_ADMIN],
     };
   }
-  async getByID({ __longToken, id }) {
+  async getByID({ __longToken, params: { id } }) {
     const { role } = __longToken;
 
     //check if the user has valid class scopes
-    if (!this.hasScope(role, "get")) {
+    if (!hasScope(this.scopes, role, "get")) {
       return nonAuthorizedError("Insufficient permissions");
     }
-    const validationIssue = await this.validators.school.getByID({
-      id,
-    });
-    if (validationIssue) {
-      // return first emitted error
-      return validationError(validationIssue[0]?.message);
+    const errors = await this.validators.school.getByID({ id });
+
+    if (errors) {
+      const messages = errors.map((error) => error.message);
+      return validationError(messages);
     }
 
-    return (
-      (await SchoolModel.findById(id)) || notFoundError("This id doesnt exist")
-    );
+    return (await SchoolModel.findById(id)) || notFoundError(this.name);
   }
 
   async getAll({ __longToken, id }) {
     const { role } = __longToken;
 
     //check if the user has valid class scopes
-    if (!this.hasScope(role, "get")) {
+    if (!hasScope(this.scopes, role, "get")) {
       return nonAuthorizedError("Insufficient permissions");
     }
 
@@ -74,21 +75,19 @@ class School {
       const { role } = __longToken;
 
       //check if the user has valid class scopes
-      if (!this.hasScope(role, "create")) {
+      if (!hasScope(this.scopes, role, "create")) {
         return nonAuthorizedError("Insufficient permissions");
       }
-      const validationIssue = await this.validators.school.create({
-        name,
-        address,
-      });
-      if (validationIssue) {
-        // return first emitted error
-        return validationError(validationIssue[0]?.message);
+      const errors = await this.validators.school.create({ name, address });
+
+      if (errors) {
+        const messages = errors.map((error) => error.message);
+        return validationError(messages);
       }
 
       const school = await SchoolModel.findOne({ name });
       if (school) {
-        return conflictError("A school with this name already exists ");
+        return conflictError(this.name);
       }
       return SchoolModel.create({ name, address });
     } catch (err) {
@@ -97,28 +96,24 @@ class School {
     }
   }
 
-  async update({ __longToken, id, name, address }) {
+  async update({ __longToken, name, address, params: { id } }) {
     try {
       const { role } = __longToken;
 
       //check if the user has valid class scopes
-      if (!this.hasScope(role, "update")) {
+      if (!hasScope(this.scopes, role, "update")) {
         return nonAuthorizedError("Insufficient permissions");
       }
-      const validationIssue = await this.validators.school.update({
-        id,
-        name,
-        address,
-      });
+      const errors = await this.validators.school.update({ id, name, address });
 
-      if (validationIssue) {
-        // return first emitted error
-
-        return validationError(validationIssue[0]?.message);
+      if (errors) {
+        const messages = errors.map((error) => error.message);
+        return validationError(messages);
       }
+
       const school = await SchoolModel.findById(id);
       if (!school) {
-        return notFoundError("This id doesn't exists");
+        return notFoundError(this.name);
       }
 
       return SchoolModel.updateOne({ _id: id }, { $set: { name, address } });
@@ -128,32 +123,41 @@ class School {
     }
   }
 
-  async delete({ __longToken, id }) {
+  async delete({ __longToken, params: { id } }) {
     try {
       const { role } = __longToken;
 
       //check if the user has valid class scopes
-      if (!this.hasScope(role, "delete")) {
+      if (!hasScope(this.scopes, role, "delete")) {
         return nonAuthorizedError("Insufficient permissions");
       }
-      const validationIssue = await this.validators.school.delete({ id });
+      const errors = await this.validators.school.delete({ id });
 
-      if (validationIssue) {
-        return validationError(validationIssue[0]?.message);
+      if (errors) {
+        const messages = errors.map((error) => error.message);
+        return validationError(messages);
       }
       // the return await here is for one liner conclusion for operands evaluation to complete
-      return (
-        (await SchoolModel.findByIdAndDelete(id)) ||
-        notFoundError("This id doesn't exist")
-      );
+      const relatedClassrooms = ClassRoomModel.find({ school: id });
+      if (!_.isEmpty(relatedClassrooms)) {
+        return conflictError(
+          this.name,
+          "Cannot delete school because dependent classrooms exist"
+        );
+      }
+      const relatedUsers = UserModel.find({ school: id });
+      if (!_.isEmpty(relatedUsers)) {
+        return conflictError(
+          this.name,
+          "Cannot delete school because dependent users exist"
+        );
+      }
+
+      return SchoolModel.findByIdAndDelete(id);
     } catch (err) {
       console.log(err);
       throw new Error("Internal server error");
     }
-  }
-
-  hasScope(role, functionName) {
-    return this.scopes[functionName].includes(role);
   }
 }
 

@@ -3,4 +3,7 @@ const roles = {
     SUPER_ADMIN: "super-admin",
   };
   
-  module.exports = roles;
+  const hasScope =(scopes,role, functionName)=>{
+    return scopes[functionName].includes(role);
+  }
+  module.exports = {roles , hasScope};

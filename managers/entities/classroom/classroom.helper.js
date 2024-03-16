@@ -1,11 +1,16 @@
-const { nonAuthorizedError } = require("../errorHandlers");
-//TODO to move auth into separate modules
-const authorizeOperation = async (scopes, __longToken, functionName) => {
-  const { role } = __longToken;
-  if(!scopes[functionName].includes(role)){
-    throw nonAuthorizedError("Insufficient permissions");
-
-  } 
+const UserModel = require("../user/user.mongoModel");
+const ClassroomModel = require("../classroom/classroom.mongoModel");
+const isAllowedAdminUpdate = async (userId, id) => {
+  const {school: classroomSchoolID} = await ClassroomModel.findById(id)
+  const { school: adminSchoolID } = await UserModel.findById(userId);
+  return adminSchoolID.toString() === classroomSchoolID.toString();
+ 
 };
 
-module.exports = { authorizeOperation };
+const isAllowedAdminCreate = async (userId, id) => {
+  const { school: adminSchoolID } = await UserModel.findById(userId);
+  return adminSchoolID.toString() === id.toString();
+ 
+};
+
+module.exports = { isAllowedAdminCreate , isAllowedAdminUpdate };

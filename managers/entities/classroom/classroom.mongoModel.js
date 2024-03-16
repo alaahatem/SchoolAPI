@@ -10,10 +10,6 @@ const classroomSchema = new mongoose.Schema({
     ref: 'School',
     required: true
   },
-  students: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Student'
-  }]
 });
 // Unique constraint on name within a school
 classroomSchema.index({ name: 1, school: 1 }, { unique: true });
