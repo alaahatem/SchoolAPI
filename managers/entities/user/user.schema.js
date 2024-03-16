@@ -1,5 +1,5 @@
 module.exports = {
-  createAdmin: [
+  createSuperAdmin: [
     {
       label: "email",
       path: "email",
