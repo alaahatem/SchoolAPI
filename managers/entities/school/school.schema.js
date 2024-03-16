@@ -1,7 +1,7 @@
 module.exports = {
   create: [
     {
-      model: "text",
+      model: "longText",
       path: "name",
       required: true,
     },
