@@ -34,7 +34,7 @@ class User {
 
   async createUser({ __longToken, email, password, role, schoolID }) {
     //By Default a super admin is created unless specified
-    const userData = { email, password };
+    const userData = { email, password , role , schoolID };
     const { role: myRole } = __longToken;
 
     //check if the user has valid class scopes
