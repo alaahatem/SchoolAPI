@@ -1,28 +1,16 @@
-const mongoose = require('mongoose');
-const paginationSchema = require('../_common/pagination.schema');
+const mongoose = require("mongoose");
+const paginationSchema = require("../_common/pagination.schema");
 
 const schoolSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
-    unique: true
+    unique: true,
   },
   address: {
     type: String,
-    required:true
+    required: true,
   },
-  admins: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User', 
-  }],
-  classrooms: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Classroom'
-  }],
-  students: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Student'
-  }],
 });
 
-module.exports = mongoose.model('School', schoolSchema);
+module.exports = mongoose.model("School", schoolSchema);

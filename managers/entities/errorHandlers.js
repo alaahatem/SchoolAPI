@@ -1,19 +1,25 @@
 const _ = require("lodash");
 
 const errorHandlers = {
-  conflictError: (message) => {
-    return { ok: false, code: 409, data: {}, errors: [message], message };
+  conflictError: (model = "", message = `This ${model} already exists`) => {
+    return { ok: false, code: 409, data: {}, message };
   },
-  validationError: (message) => {
-    return { ok: false, code: 400, data: {}, errors: [message], message };
+  validationError: (messages) => {
+    return {
+      ok: false,
+      code: 400,
+      data: {},
+      errors: [...messages],
+      message: "Validation Error",
+    };
   },
 
-  notFoundError: (message) => {
-    return { ok: false, code: 404, data: {}, errors: [message], message };
+  notFoundError: (model = "", message = `${model} not found`) => {
+    return { ok: false, code: 404, data: {}, message };
   },
 
-  nonAuthorizedError: (message) => {
-    return { ok: false, code: 403, data: {}, errors: [message], message };
+  nonAuthorizedError: (message = "Unauthorized") => {
+    return { ok: false, code: 403, data: {}, message };
   },
 };
 
