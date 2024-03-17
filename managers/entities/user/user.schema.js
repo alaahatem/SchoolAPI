@@ -14,6 +14,7 @@ module.exports = {
     {
       model: "text",
       path: "role",
+      required: true,
     },
     {
       model: "id",
@@ -35,6 +36,7 @@ module.exports = {
     {
       model: "text",
       path: "role",
+      required: true,
     },
     {
       model: "id",

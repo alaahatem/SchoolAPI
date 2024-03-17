@@ -1,22 +1,17 @@
 const bcrypt = require("bcrypt");
-const {
-  validationError,
-  conflictError,
-  notFoundError,
-  nonAuthorizedError,
-} = require("../errorHandlers");
-const UserModel = require("./user.mongoModel");
-const {hasScope, roles} = require("../_common/utils");
+
 class User {
   constructor({
+    errorHandlers,
     utils,
-    cache,
     config,
     cortex,
     managers,
     validators,
     mongomodels,
   } = {}) {
+    this.utils = utils
+    this.errorHandlers = errorHandlers
     this.config = config;
     this.cortex = cortex;
     this.validators = validators;
@@ -25,10 +20,10 @@ class User {
     this.name = "user";
     this.httpExposed = ["create", "login"];
     this.scopes = {
-      get: [roles.SUPER_ADMIN],
-      create: [roles.SUPER_ADMIN],
-      update: [roles.SUPER_ADMIN],
-      delete: [roles.SUPER_ADMIN],
+      get: [this.utils.roles.SUPER_ADMIN],
+      create: [this.utils.roles.SUPER_ADMIN],
+      update: [this.utils.roles.SUPER_ADMIN],
+      delete: [this.utils.roles.SUPER_ADMIN],
     };
   }
 
@@ -38,37 +33,38 @@ class User {
     const { role: myRole } = __longToken;
 
     //check if the user has valid class scopes
-    if (!hasScope(this.scopes, myRole, "get")) {
-      return nonAuthorizedError("Insufficient permissions");
+    if (!this.utils.hasScope(this.scopes, myRole, "create")) {
+      return this.errorHandlers.nonAuthorizedError("Insufficient permissions");
     }
     // Data validation
 
     const errors =
-      role === roles.SUPER_ADMIN
+      role === this.utils.roles.SUPER_ADMIN
         ? await this.validators.user.createSuperAdmin(userData)
         : await this.validators.user.createAdmin(userData);
 
     if (errors) {
       const messages = errors.map((error) => error.message);
-      return validationError(messages);
+      return this.errorHandlers.validationError(messages);
     }
 
     try {
-      const existingUser = await UserModel.findOne({ email });
+      const existingUser = await this.mongomodels.user.findOne({ email });
       if (existingUser) {
-        return conflictError(this.name);
+        return this.errorHandlers.this.errorHandlers.conflictError(this.name);
       }
 
       const salt = await bcrypt.genSalt(10);
       const passwordHash = await bcrypt.hash(password, salt);
 
 
-      const savedUser = UserModel.create({
+      const savedUser = await this.mongomodels.user.create({
         email,
         role,
         password: passwordHash,
         school: schoolID, // Set the school ID if role is admin
       })
+      console.log(savedUser)
       const longToken = this.tokenManager.genLongToken({
         userId: savedUser._id,
         role,
@@ -77,24 +73,26 @@ class User {
       return { code: 201, data: { savedUser, longToken } };
     } catch (err) {
       console.error("Error creating user:", err);
+      return this.errorHandlers.internalServerError(err.message);
+
     }
   }
 
   async login({ email, password }) {
     try {
-      const user = await UserModel.findOne({ email });
+      const user = await this.mongomodels.user.findOne({ email });
       const errors = await this.validators.user.login({ email, password });
 
       if (errors) {
         const messages = errors.map((error) => error.message);
-        return validationError(messages);
+        return this.errorHandlers.validationError(messages);
       }
       if (!user) {
-        return notFoundError(this.name);
+        return this.errorHandlers.notFoundError(this.name);
       }
       const isMatchHash = await bcrypt.compare(password, user.password);
       if (!isMatchHash) {
-        return nonAuthorizedError("Invalid credentials");
+        return this.errorHandlers.nonAuthorizedError("Invalid credentials");
       }
 
       const token = this.tokenManager.genLongToken({
@@ -105,7 +103,7 @@ class User {
       return { user, token };
     } catch (error) {
       console.error("Login Error", error);
-      throw error;
+      return this.errorHandlers.internalServerError(err.message);
     }
   }
 }

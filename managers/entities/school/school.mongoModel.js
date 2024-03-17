@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const paginationSchema = require("../_common/pagination.schema");
 
 const schoolSchema = new mongoose.Schema({
   name: {

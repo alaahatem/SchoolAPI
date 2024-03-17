@@ -3,7 +3,7 @@ const emojis = require("../../public/emojis.data.json");
 module.exports = {
   id: {
     type: "string",
-    length: { min: 1, max: 50 },
+    length: { min: 24, max: 24 },
   },
   address: {
     path: "address",

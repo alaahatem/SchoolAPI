@@ -1,28 +1,15 @@
-const {
-  validationError,
-  conflictError,
-  notFoundError,
-  nonAuthorizedError,
-} = require("../errorHandlers");
-const _ = require("lodash");
-
-const {roles, hasScope} = require("../_common/utils");
-const StudentModel = require("./student.mongoModel");
-const ClassRoomModel = require("../classroom/classroom.mongoModel");
-const UserModel = require("../user/user.mongoModel");
-const { isAllowedAdmin } = require("./student.helper");
 class School {
   constructor({
     utils,
-    cache,
+    errorHandlers,
     config,
-    cortex,
     managers,
     validators,
     mongomodels,
   } = {}) {
+    this.errorHandlers = errorHandlers;
+    this.utils = utils;
     this.config = config;
-    this.cortex = cortex;
     this.validators = validators;
     this.mongomodels = mongomodels;
     this.tokenManager = managers.token;
@@ -35,38 +22,58 @@ class School {
       "get=getAll",
     ];
     this.scopes = {
-      get: [roles.SUPER_ADMIN, roles.ADMIN],
-      create: [roles.SUPER_ADMIN, roles.ADMIN],
-      update: [roles.SUPER_ADMIN, roles.ADMIN],
-      delete: [roles.SUPER_ADMIN, roles.ADMIN],
+      get: [this.utils.roles.SUPER_ADMIN, this.utils.roles.ADMIN],
+      create: [this.utils.roles.SUPER_ADMIN, this.utils.roles.ADMIN],
+      update: [this.utils.roles.SUPER_ADMIN, this.utils.roles.ADMIN],
+      delete: [this.utils.roles.SUPER_ADMIN, this.utils.roles.ADMIN],
     };
   }
   async getByID({ __longToken, params: { id } }) {
-    const { role } = __longToken;
+    console.log(this.errorHandlers);
+    try {
+      const { role } = __longToken;
 
-    //check if the user has valid class scopes
-    if (!hasScope(this.scopes,role, "get")) {
-      return nonAuthorizedError("Insufficient permissions");
+      //check if the user has valid class scopes
+      if (!this.utils.hasScope(this.scopes, role, "get")) {
+        return this.errorHandlers.nonAuthorizedError(
+          "Insufficient permissions"
+        );
+      }
+      const errors = await this.validators.student.getByID({ id });
+
+      if (errors) {
+        const messages = errors.map((error) => error.message);
+        return this.errorHandlers.validationError(messages);
+      }
+
+      return (
+        (await this.mongomodels.student.findById(id)) ||
+        this.errorHandlers.notFoundError(this.name)
+      );
+    } catch (err) {
+      console.error(err);
+      return internalServerError(err.message);
     }
-    const errors = await this.validators.student.getByID({ id });
-
-    if (errors) {
-      const messages = errors.map((error) => error.message);
-      return validationError(messages);
-    }
-
-    return (await StudentModel.findById(id)) || notFoundError(this.name);
   }
 
   async getAll({ __longToken, classroomID }) {
-    const { role } = __longToken;
+    try {
+      const { role } = __longToken;
 
-    //check if the user has valid class scopes
-    if (!hasScope(this.scopes,role, "get")) {
-        return nonAuthorizedError("Insufficient permissions");
+      //check if the user has valid class scopes
+      if (!this.utils.hasScope(this.scopes, role, "get")) {
+        return this.errorHandlers.nonAuthorizedError(
+          "Insufficient permissions"
+        );
       }
 
-    return await StudentModel.find(classroomID ? { classroom: classroomID } : {});
+      return await this.mongomodels.student.find(
+        classroomID ? { classroom: classroomID } : {}
+      );
+    } catch (err) {
+      console.error(err);
+      return internalServerError(err.message);
+    }
   }
 
   async create({ __longToken, name, age, classroomID }) {
@@ -74,8 +81,10 @@ class School {
       const { role } = __longToken;
 
       //check if the user has valid class scopes
-      if (!hasScope(this.scopes,role, "create")) {
-        return nonAuthorizedError("Insufficient permissions");
+      if (!this.utils.hasScope(this.scopes, role, "create")) {
+        return this.errorHandlers.nonAuthorizedError(
+          "Insufficient permissions"
+        );
       }
       const errors = await this.validators.student.create({
         name,
@@ -85,17 +94,22 @@ class School {
 
       if (errors) {
         const messages = errors.map((error) => error.message);
-        return validationError(messages);
+        return this.errorHandlers.validationError(messages);
       }
 
-      const existingClassroom = ClassRoomModel.findById(classroomID);
+      const existingClassroom =
+        this.mongomodels.classroom.findById(classroomID);
       if (!existingClassroom) {
-        notFoundError("Classroom");
+        this.errorHandlers.notFoundError("Classroom");
       }
-      return StudentModel.create({ name, age, classroom: classroomID });
+      return this.mongomodels.student.create({
+        name,
+        age,
+        classroom: classroomID,
+      });
     } catch (err) {
       console.error(err);
-      throw new Error("Internal server error");
+      return internalServerError(err.message);
     }
   }
 
@@ -104,12 +118,17 @@ class School {
       const { userId, role } = __longToken;
 
       //check if the user has valid class scopes
-      if (!hasScope(this.scopes,role, "update")) {
-        return nonAuthorizedError("Insufficient permissions");
+      if (!this.utils.hasScope(this.scopes, role, "update")) {
+        return this.errorHandlers.nonAuthorizedError(
+          "Insufficient permissions"
+        );
       }
       //check if this is admin then check if they have access
-      if (role !== roles.SUPER_ADMIN && !(await isAllowedAdmin(userId, id))) {
-        return nonAuthorizedError(
+      if (
+        role !== this.utils.roles.SUPER_ADMIN &&
+        !(await this.isAllowedAdmin(this.mongomodels, userId, id))
+      ) {
+        return this.errorHandlers.nonAuthorizedError(
           "This admin doesn't have access to this student"
         );
       }
@@ -123,19 +142,19 @@ class School {
 
       if (errors) {
         const messages = errors.map((error) => error.message);
-        return validationError(messages);
+        return this.errorHandlers.validationError(messages);
       }
 
       return (
-        (await StudentModel.findByIdAndUpdate(
+        (await this.mongomodels.student.findByIdAndUpdate(
           id,
           { name, age, classroom: classroomID },
           { new: true }
-        )) || notFoundError(this.name)
+        )) || this.errorHandlers.notFoundError(this.name)
       );
     } catch (err) {
       console.log(err);
-      throw new Error("Internal server error");
+      return internalServerError(err.message);
     }
   }
 
@@ -143,13 +162,18 @@ class School {
     try {
       const { userId, role } = __longToken;
 
-    //check if the user has valid class scopes
-    if (!hasScope(this.scopes,role, "delete")) {
-        return nonAuthorizedError("Insufficient permissions");
+      //check if the user has valid class scopes
+      if (!this.utils.hasScope(this.scopes, role, "delete")) {
+        return this.errorHandlers.nonAuthorizedError(
+          "Insufficient permissions"
+        );
       }
       //check if this is admin then check if they have access
-      if (role !== roles.SUPER_ADMIN && !(await isAllowedAdmin(userId, id))) {
-        return nonAuthorizedError(
+      if (
+        role !== this.utils.roles.SUPER_ADMIN &&
+        !(await this.isAllowedAdmin(this.mongomodels, userId, id))
+      ) {
+        return this.errorHandlers.nonAuthorizedError(
           "This admin doesn't have access to this student"
         );
       }
@@ -157,20 +181,29 @@ class School {
 
       if (errors) {
         const messages = errors.map((error) => error.message);
-        return validationError(messages);
+        return this.errorHandlers.validationError(messages);
       }
       // the return await here is for one liner conclusion for operands evaluation to complete
 
       return (
-        (await StudentModel.findByIdAndDelete(id)) || notFoundError(this.name)
+        (await this.mongomodels.student.findByIdAndDelete(id)) ||
+        this.errorHandlers.notFoundError(this.name)
       );
     } catch (err) {
       console.log(err);
-      throw new Error("Internal server error");
+      return internalServerError(err.message);
     }
   }
 
-
+  isAllowedAdmin = async (repo, userId, id) => {
+    const student = await repo.student.findById(id).populate("classroom");
+    if(!student){
+      return  this.errorHandlers.notFoundError(this.name)
+    }
+    const user = await repo.user.findById(userId);
+    return user.school.toString() === student.classroom?.school.toString();
+  };
+  
 }
 
 module.exports = School;

@@ -7,6 +7,7 @@ const VirtualStack = require("../managers/virtual_stack/VirtualStack.manager");
 const ValidatorsLoader = require("./ValidatorsLoader");
 const ResourceMeshLoader = require("./ResourceMeshLoader");
 const utils = require("../libs/utils");
+const errorHandlers = require("../managers/entities/errorHandlers")
 const MongoLoader = require("./MongoLoader");
 
 const systemArch = require("../static_arch/main.system");
@@ -17,6 +18,7 @@ const UserManager = require("../managers/entities/user/user.manager");
 const SchoolManager = require("../managers/entities/school/school.manager");
 const ClassroomManager = require("../managers/entities/classroom/classroom.manager");
 const StudentManager = require("../managers/entities/student/student.manager");
+
 /**
  * load sharable modules
  * @return modules tree with instance of each module
@@ -31,6 +33,7 @@ module.exports = class ManagersLoader {
     this._preload();
     this.injectable = {
       utils,
+      errorHandlers,
       cache,
       config,
       cortex,

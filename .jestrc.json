@@ -1,0 +1,14 @@
+{
+  "testEnvironment": "node",
+  "testEnvironmentOptions": {
+    "NODE_ENV": "test"
+  },
+  "restoreMocks": true,
+  "clearMocks": true,
+  "rootDir": "./managers",
+  "moduleFileExtensions": ["js", "json"],
+  "testRegex": ".spec.js$",
+  "modulePathIgnorePatterns": [
+      ".*__mocks__.*"
+    ]
+}
