@@ -1,4 +1,4 @@
-# My API Documentation
+# School API Documentation
 
 ## Introduction
 
