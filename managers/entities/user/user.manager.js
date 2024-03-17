@@ -62,14 +62,13 @@ class User {
       const salt = await bcrypt.genSalt(10);
       const passwordHash = await bcrypt.hash(password, salt);
 
-      const newUser = new UserModel({
+
+      const savedUser = UserModel.create({
         email,
         role,
         password: passwordHash,
         school: schoolID, // Set the school ID if role is admin
-      });
-
-      const savedUser = newUser.save();
+      })
       const longToken = this.tokenManager.genLongToken({
         userId: savedUser._id,
         role,

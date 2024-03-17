@@ -66,7 +66,7 @@ class School {
         return nonAuthorizedError("Insufficient permissions");
       }
 
-    return await StudentModel.find(classroom ? { classroom: classroomID } : {});
+    return await StudentModel.find(classroomID ? { classroom: classroomID } : {});
   }
 
   async create({ __longToken, name, age, classroomID }) {
