@@ -15,8 +15,8 @@ module.exports = {
   update: [
     {
       label: "id",
+      path: "id",
       model: "id",
-      type: "Number",
       required: true,
     },
     {

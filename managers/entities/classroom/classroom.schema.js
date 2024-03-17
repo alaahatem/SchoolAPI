@@ -16,7 +16,6 @@ module.exports = {
       label: "id",
       path: "id",
       model: "id",
-      type: "Number",
       required: true,
     },
     {
@@ -33,7 +32,6 @@ module.exports = {
       label: "id",
       path: "id",
       model: "id",
-      type: "Number",
       required: true,
     },
   ],
@@ -42,7 +40,6 @@ module.exports = {
       label: "id",
       path: "id",
       model: "id",
-      type: "Number",
       required: true,
     },
   ],

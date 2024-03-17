@@ -99,7 +99,6 @@ class School {
   async update({ __longToken, name, address, params: { id } }) {
     try {
       const { role } = __longToken;
-
       //check if the user has valid class scopes
       if (!hasScope(this.scopes, role, "update")) {
         return nonAuthorizedError("Insufficient permissions");
