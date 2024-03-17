@@ -64,7 +64,6 @@ class User {
         password: passwordHash,
         school: schoolID, // Set the school ID if role is admin
       })
-      console.log(savedUser)
       const longToken = this.tokenManager.genLongToken({
         userId: savedUser._id,
         role,

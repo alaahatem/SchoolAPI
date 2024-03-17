@@ -8,7 +8,7 @@ This API provides endpoints to manage users in the system. Users can be created 
 
 Authentication is required for all endpoints. The API uses JSON Web Tokens (JWT) for authentication. To authenticate, include the JWT token in the Authorization header of the request.
 
-
+Use Bearer Token In Authorization Header
 
 ## Base URL
 

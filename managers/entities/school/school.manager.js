@@ -31,7 +31,6 @@ class School {
     };
   }
   async getByID({ __longToken, params: { id } }) {
-    console.log(this.errorHandlers)
     try {
       const { role } = __longToken;
 
@@ -54,7 +53,6 @@ class School {
   }
 
   async getAll({ __longToken }) {
-    console.log(this.c)
     try {
       const { role } = __longToken;
 
@@ -98,7 +96,6 @@ class School {
 
   async update({ __longToken, name, address, params: { id } }) {
     try {
-      console.log(this.tokenManager)
       const { role } = __longToken;
       //check if the user has valid class scopes
       if (!this.utils.hasScope(this.scopes, role, "update")) {

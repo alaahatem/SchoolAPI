@@ -29,7 +29,6 @@ class School {
     };
   }
   async getByID({ __longToken, params: { id } }) {
-    console.log(this.errorHandlers);
     try {
       const { role } = __longToken;
 

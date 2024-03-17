@@ -76,14 +76,12 @@ class Classroom {
   }
   async create({ __longToken, name, schoolID }) {
     try {
-      console.log(this.errorHandlers);
       const { userId, role } = __longToken;
       if (!this.utils.hasScope(this.scopes, role, "create")) {
         return this.errorHandlers.nonAuthorizedError(
           "Insufficient permissions"
         );
       }
-      console.log({ name, schoolID });
       //check if this is admin then check if they have access
       if (
         role !== this.utils.roles.SUPER_ADMIN &&
