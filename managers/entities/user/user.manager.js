@@ -23,7 +23,7 @@ class User {
     this.mongomodels = mongomodels;
     this.tokenManager = managers.token;
     this.name = "user";
-    this.httpExposed = ["createUser", "login"];
+    this.httpExposed = ["create", "login"];
     this.scopes = {
       get: [roles.SUPER_ADMIN],
       create: [roles.SUPER_ADMIN],
@@ -32,7 +32,7 @@ class User {
     };
   }
 
-  async createUser({ __longToken, email, password, role, schoolID }) {
+  async create({ __longToken, email, password, role, schoolID }) {
     //By Default a super admin is created unless specified
     const userData = { email, password , role , schoolID };
     const { role: myRole } = __longToken;

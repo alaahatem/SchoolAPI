@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This API provides endpoints to manage users in the system. Users can be created using the `createUser` endpoint, and existing users can log in using the `login` endpoint. 
+This API provides endpoints to manage users in the system. Users can be created using the `create` endpoint, and existing users can log in using the `login` endpoint. 
 
 ## Authentication
 
@@ -20,7 +20,7 @@ The base URL for all API endpoints is `https://cyan-unusual-moose.cyclic.app/api
 
 #### Endpoint
 
-- **URL:** `/users/create`
+- **URL:** `/user/create`
 - **Method:** POST
 
 #### Request Body
@@ -42,7 +42,7 @@ The base URL for all API endpoints is `https://cyan-unusual-moose.cyclic.app/api
 #### Example
 
 ```json
-POST /api/users/create
+POST /api/user/create
 {
     "email": "admin@example.com",
     "password": "password123",
@@ -54,7 +54,7 @@ POST /api/users/create
 
 #### Endpoint
 
-- **URL:** `/users/login`
+- **URL:** `/user/login`
 - **Method:** POST
 
 #### Request Body
@@ -72,7 +72,7 @@ POST /api/users/create
 #### Example
 
 ```json
-POST /api/users/create
+POST /api/user/create
 {
     "email": "admin@example.com",
     "password": "password123",
@@ -125,7 +125,7 @@ POST /api/student/create
 
 #### Endpoint
 
-- **URL:** `/students/update/:id`
+- **URL:** `/student/update/:id`
 - **Method:** PUT
 - **Authentication Required:** Yes
 
@@ -187,7 +187,7 @@ DELETE /api/student/update/609be8f5c3f6826c398a304f
 
 ## Endpoint
 
-- **URL:** `/student/get/:id`
+- **URL:** `/student/getByID/:id`
 - **Method:** GET
 - **Authentication Required:** Yes
 
@@ -215,7 +215,7 @@ This endpoint retrieves all students, optionally filtered by classroom ID.
 
 ## Endpoint
 
-- **URL:** `/students/getAll`
+- **URL:** `/student/getAll`
 - **Method:** GET
 - **Authentication Required:** Yes
 
@@ -248,7 +248,7 @@ To perform any CRUD operation on a classroom, the user must have one of the foll
 
 #### Endpoint
 
-- **URL:** `/classrooms/getAll`
+- **URL:** `/classroom/getAll`
 - **Method:** GET
 - **Authentication Required:** Yes
 
@@ -266,7 +266,7 @@ To perform any CRUD operation on a classroom, the user must have one of the foll
 
 #### Endpoint
 
-- **URL:** `/classrooms/get/:id`
+- **URL:** `/classroom/getByID/:id`
 - **Method:** GET
 - **Authentication Required:** Yes
 
@@ -303,7 +303,7 @@ To perform any CRUD operation on a classroom, the user must have one of the foll
 
 #### Endpoint
 
-- **URL:** `/classrooms/getAll`
+- **URL:** `/classroom/getAll`
 - **Method:** GET
 - **Authentication Required:** Yes
 
@@ -321,7 +321,7 @@ To perform any CRUD operation on a classroom, the user must have one of the foll
 
 #### Endpoint
 
-- **URL:** `/classrooms/get/:id`
+- **URL:** `/classroom/getByID/:id`
 - **Method:** GET
 - **Authentication Required:** Yes
 
@@ -401,7 +401,7 @@ To perform any CRUD operation on a school, the user must have one of the followi
 
 #### Endpoint
 
-- **URL:** `/schools/getAll`
+- **URL:** `/school/getAll`
 - **Method:** GET
 - **Authentication Required:** Yes
 
@@ -419,7 +419,7 @@ To perform any CRUD operation on a school, the user must have one of the followi
 
 #### Endpoint
 
-- **URL:** `/school/get/:id`
+- **URL:** `/school/getByID/:id`
 - **Method:** GET
 - **Authentication Required:** Yes
 
