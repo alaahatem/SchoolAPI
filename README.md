@@ -72,12 +72,10 @@ POST /api/user/create
 #### Example
 
 ```json
-POST /api/user/create
+POST /api/user/login
 {
     "email": "admin@example.com",
     "password": "password123",
-    "role": "admin",
-    "schoolID": "65f6040ed1ddcd3a62e81243"
 }
 ```
 
@@ -155,7 +153,7 @@ PUT /api/student/update/609be8f5c3f6826c398a304f
 
 ```
 
-### Delete User
+### Delete Student
 
 #### Endpoint
 
@@ -183,7 +181,7 @@ DELETE /api/student/update/609be8f5c3f6826c398a304f
 
 ```
 
-# Get Student by ID
+### Get Student by ID
 
 ## Endpoint
 
@@ -234,6 +232,8 @@ This endpoint retrieves all students, optionally filtered by classroom ID.
 - **403 Forbidden:** If the user does not have permission to retrieve students.
 
 
+--------------------
+## User Entity
 
 ## Access Control
 
@@ -285,60 +285,6 @@ To perform any CRUD operation on a classroom, the user must have one of the foll
 - **403 Forbidden:** If the user does not have permission to retrieve the classroom.
 - **404 Not Found:** If the specified classroom does not exist.
 
-
-## Classroom Entity
-
-
-
-## Access Control
-
-To perform any CRUD operation on a classroom, the user must have one of the following roles:
-
-- **Super Admin**: Full access to all classrooms.
-- **Admin**: Access limited to classrooms in the same school.
-
-## Endpoints
-
-### Get All Classrooms
-
-#### Endpoint
-
-- **URL:** `/classroom/getAll`
-- **Method:** GET
-- **Authentication Required:** Yes
-
-#### Response
-
-- **Status:** 200 OK
-- **Body:** An array of classroom objects.
-
-#### Error Responses
-
-- **401 Unauthorized:** If authentication is required but missing or invalid.
-- **403 Forbidden:** If the user does not have permission to retrieve classrooms.
-
-### Get Classroom by ID
-
-#### Endpoint
-
-- **URL:** `/classroom/getByID/:id`
-- **Method:** GET
-- **Authentication Required:** Yes
-
-#### Request Parameters
-
-- **id** (string, required): The ID of the classroom to retrieve.
-
-#### Response
-
-- **Status:** 200 OK
-- **Body:** The classroom object.
-
-#### Error Responses
-
-- **401 Unauthorized:** If authentication is required but missing or invalid.
-- **403 Forbidden:** If the user does not have permission to retrieve the classroom.
-- **404 Not Found:** If the specified classroom does not exist.
 
 ### Create Classroom
 
@@ -352,6 +298,14 @@ To perform any CRUD operation on a classroom, the user must have one of the foll
 
 - **name** (string, required): The name of the classroom.
 - **schoolID** (string, required): The ID of the school the classroom belongs to.
+
+```json
+POST /api/classroom/create
+{
+    "name": "Test Classroom",
+    "schoolID": "65f5d3f59a5ae2a9745f513f"
+}
+```
 
 ### Update Classroom
 
@@ -367,6 +321,15 @@ id (string, required): The ID of the classroom to update.
 #### Request Body
 
 - **name** (string, required): The name of the classroom.
+
+
+
+```json
+POST /api/classroom/update/65f5e591356cbd0fc267c56c
+{
+    "name": "Test Classroom 1",
+}
+```
 
 ### Delete Classroom
 
@@ -452,6 +415,13 @@ To perform any CRUD operation on a school, the user must have one of the followi
 - **address** (string, required): The address of the school.
 
 
+```json
+POST /api/school/create
+{
+    "name": "Test School",
+}
+```
+
 ### Update School
 
 #### Endpoint
@@ -467,6 +437,13 @@ id (string, required): The ID of the school to update.
 
 - **name** (string, required): The name of the school.
 - **address** (string, required): The address of the school.
+
+```json
+POST /api/school/update/65f5d3f59a5ae2a9745f513f
+{
+    "name": "Test School",
+}
+```
 
 ### Delete Classroom
 
