@@ -59,7 +59,7 @@ class School {
     return (await SchoolModel.findById(id)) || notFoundError(this.name);
   }
 
-  async getAll({ __longToken, id }) {
+  async getAll({ __longToken }) {
     const { role } = __longToken;
 
     //check if the user has valid class scopes
